@@ -32,15 +32,59 @@ conn.connect((err) => {
 //  Define routes
 app.get("/", (req, res) => res.send("Hello World"))
 
-// localhost:1111/books/
+// localhost:1112/books/
 app.get("/books/", (req, res) => {
   conn.query("SELECT * FROM books", (err, result) => {
-    if (err)
-    {
+    if (err) {
       throw err
     }
 
     res.render("index", { result: result })
+  })
+})
+
+// localhost:1112/books/delete
+app.post("/books/delete", (req, res) => {
+  const id = req.body.id
+  const query = "DELETE FROM books WHERE _id=?"
+  conn.query(query, [id], (err, result) => {
+    console.log(`Record with id ${id} removed`)
+    conn.query("SELECT * FROM books", (err, result) => {
+      res.render("index", { result: result })
+    })
+  })
+})
+
+app.get("/books/create", (req, res) => res.render("create"))
+
+app.post("/books/insert", (req, res) => {
+  //  Auto-generated id
+  const id = req.body._id
+
+  //  Form fields
+  const title = req.body.title
+  const author = req.body.author
+  const publisher = req.body.publisher
+  const edition = req.body.edition
+  const year = req.body.year
+  const category = req.body.category
+  const isbn = req.body.isbn
+  const rating = req.body.rating
+
+  //  Set up string for query
+  const query =
+    "INSERT INTO books (title, author, publisher, edition, year, category, isbn, rating) VALUES ?"
+
+  //  Set up values array
+  const values = [
+    [title, author, publisher, edition, year, category, isbn, rating],
+  ]
+
+  //  Run query
+  conn.query(query, [values], (err, result) => {
+    conn.query("SELECT * FROM books", (err, result) => {
+      res.render("index", { result: result })
+    })
   })
 })
 
