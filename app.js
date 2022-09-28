@@ -88,4 +88,32 @@ app.post("/books/insert", (req, res) => {
   })
 })
 
+app.post("/books/edit_employee", (req, res) => {
+  const id = req.body.id
+
+  console.log(`In edit_employee routine. The id is: ${id}`)
+
+  const title = req.body.title
+  const author = req.body.author
+  const publisher = req.body.publisher
+  const edition = req.body.edition
+  const year = req.body.year
+  const category = req.body.category
+  const isbn = req.body.isbn
+  const rating = req.body.rating
+
+  const query =
+    "UPDATE books SET title = ?, author = ?, publisher = ?, edition = ?, year = ?, category = ?, isbn = ?, rating = ? WHERE _id = ?"
+  conn.query(
+    query,
+    [title, author, publisher, edition, year, category, isbn, rating, id],
+    (err, result) => {
+      console.log(`Record with id ${id} updated!`)
+      conn.query("SELECT * FROM books", (err, result) => {
+        res.render("index", { result: result })
+      })
+    }
+  )
+})
+
 app.listen(port, () => console.log(`App running on port ${port}`))
